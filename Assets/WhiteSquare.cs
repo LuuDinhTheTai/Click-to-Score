@@ -2,36 +2,31 @@ using UnityEngine;
 
 public class WhiteSquare : MonoBehaviour
 {
-    void Start()
+    private void OnMouseDown()
     {
-        Camera.main.backgroundColor = Color.black;
-    }
-
-    void Update()
-    {
-        if (Input.GetMouseButtonDown(0))
-        {  
-            Destroy(gameObject);
-            Spawn();
-        }
+        Debug.Log("White square clicked");
+        ScoreBoard.score += 1;
+        Destroy(gameObject);
+        Spawn();
     }
 
     private void Spawn()
     {
-        // Tạo vị trí ngẫu nhiên trong khung nhìn camera
-        Vector2 randomViewPos = new Vector2(Random.value, Random.value);
-        Vector3 worldPos = Camera.main.ViewportToWorldPoint(new Vector3(randomViewPos.x, randomViewPos.y, 10f));
+        // Camera thường ở z = -10 => Chọn z = 0 cho WorldPos là phổ biến
+        Vector2 vp = new Vector2(Random.value, Random.value);
+        float z = 0f; // Đặt đúng z trên mặt phẳng camera nhìn thấy
+        Vector3 worldPos = Camera.main.ViewportToWorldPoint(new Vector3(vp.x, vp.y, Mathf.Abs(Camera.main.transform.position.z) + z));
 
-        // Tạo GameObject mới (ô trắng)
-        GameObject newSquare = GameObject.CreatePrimitive(PrimitiveType.Cube);
-        newSquare.transform.position = worldPos;
-        newSquare.transform.localScale = new Vector3(1, 1, 1);
+        GameObject sq = GameObject.CreatePrimitive(PrimitiveType.Cube);
 
-        // Đặt màu trắng cho ô vuông
-        var renderer = newSquare.GetComponent<Renderer>();
-        renderer.material.color = Color.white;
+        sq.transform.position = worldPos;
+        sq.transform.localScale = Vector3.one;
+        sq.GetComponent<Renderer>().material.color = Color.white;
+        sq.AddComponent<WhiteSquare>();
+    }
 
-        // Gắn lại script để có thể click tiếp
-        newSquare.AddComponent<WhiteSquare>();
+    private void Start()
+    {
+        Camera.main.backgroundColor = Color.black;
     }
 }
